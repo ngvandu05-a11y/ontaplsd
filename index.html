@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Kiểm Tra Trắc Nghiệm Lịch Sử Đảng</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter & Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            overflow-x: hidden;
+            word-break: break-word;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Đảm bảo responsive tối ưu cho các phần tử chữ và bảng */
+        * {
+            box-sizing: border-box;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased">
+
+    <header class="bg-red-900 text-white shadow-md sticky top-0 z-50 w-full">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
+                <div class="bg-yellow-500 text-red-950 font-bold p-2 rounded-lg shadow flex-shrink-0">
+                    <i class="fa-solid fa-landmark text-lg sm:text-xl"></i>
+                </div>
+                <div class="min-w-0">
+                    <h1 class="font-bold text-sm sm:text-lg md:text-xl tracking-tight truncate">TRẮC NGHIỆM LỊCH SỬ ĐẢNG</h1>
+                    <p class="text-[11px] sm:text-xs text-red-200 truncate">Kho đề thi chuẩn hóa • 50 câu hỏi • 60 phút</p>
+                </div>
+            </div>
+            <div id="header-timer-container" class="hidden items-center bg-red-950/60 px-3 sm:px-4 py-1.5 rounded-full border border-red-700 flex-shrink-0">
+                <i class="fa-regular fa-clock text-yellow-400 mr-2 animate-pulse"></i>
+                <span id="timer-display" class="font-mono font-bold text-yellow-400 text-base sm:text-lg">60:00</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 flex flex-col justify-center">
+
+        <!-- SCREEN 1: WELCOME / START SCREEN -->
+        <div id="screen-welcome" class="bg-white rounded-2xl shadow-xl p-4 sm:p-6 md:p-10 max-w-3xl mx-auto my-auto w-full border border-slate-200">
+            <div class="text-center mb-6 sm:mb-8">
+                <div class="inline-block bg-red-100 text-red-800 text-[11px] sm:text-xs font-semibold px-3 py-1 rounded-full mb-3 uppercase tracking-wider">
+                    Bài ôn tập & Kiểm tra
+                </div>
+                <h2 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 mb-2 leading-snug">ÔN TẬP LỊCH SỬ ĐẢNG - GIỮA KÌ</h2>
+                <p class="text-slate-600 text-xs sm:text-sm md:text-base">Hệ thống tự động lựa chọn ngẫu nhiên 50 câu hỏi từ ngân hàng câu hỏi.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                <div class="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-100 text-center">
+                    <i class="fa-solid fa-list-check text-red-700 text-xl sm:text-2xl mb-2"></i>
+                    <h3 class="font-bold text-slate-800 text-xs sm:text-sm">Số lượng câu hỏi</h3>
+                    <p class="text-slate-600 text-base sm:text-lg font-bold">50 câu</p>
+                </div>
+                <div class="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-100 text-center">
+                    <i class="fa-solid fa-hourglass-half text-red-700 text-xl sm:text-2xl mb-2"></i>
+                    <h3 class="font-bold text-slate-800 text-xs sm:text-sm">Thời gian làm bài</h3>
+                    <p class="text-slate-600 text-base sm:text-lg font-bold">60 phút</p>
+                </div>
+                <div class="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-100 text-center">
+                    <i class="fa-solid fa-shuffle text-red-700 text-xl sm:text-2xl mb-2"></i>
+                    <h3 class="font-bold text-slate-800 text-xs sm:text-sm">Xáo trộn tự động</h3>
+                    <p class="text-slate-600 text-base sm:text-lg font-bold">Câu & Đáp án</p>
+                </div>
+            </div>
+
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-3 sm:p-4 rounded-r-xl mb-6 sm:mb-8">
+                <div class="flex items-start">
+                    <i class="fa-solid fa-circle-exclamation text-amber-600 mt-0.5 mr-3 flex-shrink-0"></i>
+                    <div class="text-xs sm:text-sm text-amber-900 leading-relaxed">
+                        <span class="font-bold">Lưu ý quan trọng:</span>
+                        <ul class="list-disc ml-4 sm:ml-5 mt-1 space-y-1">
+                            <li>Chế độ <span class="font-bold">Thi mới</span> sẽ bấm giờ và tính điểm chính thức.</li>
+                            <li>Chế độ <span class="font-bold">Ôn tập</span> cho phép hiển thị luôn đáp án ngay sau khi chọn để dễ dàng nắm bài.</li>
+                            <li>Lịch sử các lần làm bài sẽ được tự động ghi nhận trên thiết bị của bạn.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Các nút chức năng: Thi mới, Ôn tập, Ôn tập câu sai -->
+            <div class="flex flex-col sm:flex-row justify-center items-stretch sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+                <button onclick="startExam()" class="w-full sm:w-auto bg-red-700 hover:bg-red-800 text-white font-bold px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center text-xs sm:text-sm">
+                    <i class="fa-solid fa-play mr-2"></i> VÀO THI THỬ
+                </button>
+                <button onclick="startReviewMode()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center text-xs sm:text-sm">
+                    <i class="fa-solid fa-book-open-reader mr-2"></i> ÔN TẬP
+                </button>
+                <button onclick="startReviewWrongExam()" id="btn-review-wrong-welcome" class="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white font-bold px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center text-xs sm:text-sm">
+                    <i class="fa-solid fa-rotate-left mr-2"></i> ÔN TẬP CÂU SAI (<span id="wrong-count-badge-wel">0</span>)
+                </button>
+            </div>
+
+            <!-- LOCAL DEVICE HISTORY SECTION -->
+            <div id="device-history-section" class="border-t border-slate-100 pt-5 sm:pt-6">
+                <div class="flex flex-wrap justify-between items-center gap-2 mb-3 sm:mb-4">
+                    <h3 class="font-bold text-slate-800 text-xs sm:text-sm flex items-center">
+                        <i class="fa-solid fa-clock-rotate-left text-red-700 mr-2"></i> Lịch sử làm bài đã lưu trên thiết bị này
+                    </h3>
+                    <button onclick="clearDeviceHistory()" id="btn-clear-history" class="hidden text-xs text-rose-600 hover:text-rose-700 font-semibold flex items-center">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Xóa lịch sử
+                    </button>
+                </div>
+                <div id="device-history-list" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar p-1">
+                    <!-- History items injected dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: EXAM / PRACTICE INTERFACE -->
+        <div id="screen-exam" class="hidden flex-col lg:flex-row gap-4 sm:gap-6 w-full">
+            <!-- Left Column: Question Area -->
+            <div class="flex-grow bg-white rounded-2xl shadow-md p-4 sm:p-6 md:p-8 flex flex-col justify-between border border-slate-200">
+                <div>
+                    <!-- Question Top Meta -->
+                    <div class="flex flex-wrap justify-between items-center gap-2 pb-4 border-b border-slate-100 mb-4 sm:mb-6">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span id="current-q-number" class="bg-red-100 text-red-800 font-bold text-xs sm:text-sm px-3 py-1 rounded-lg">Câu 1 / 50</span>
+                            <span id="badge-flagged" class="hidden bg-amber-100 text-amber-800 text-xs px-2.5 py-1 rounded-full font-medium items-center">
+                                <i class="fa-solid fa-flag mr-1"></i> Đã đánh dấu xem lại
+                            </span>
+                        </div>
+                        <button onclick="toggleFlagCurrent()" id="btn-flag" class="text-slate-500 hover:text-amber-500 transition-colors text-xs sm:text-sm font-medium flex items-center bg-slate-50 hover:bg-amber-50 px-3 py-1.5 rounded-lg border border-slate-200">
+                            <i class="fa-regular fa-flag mr-1.5"></i> <span id="flag-text">Đánh dấu xem lại</span>
+                        </button>
+                    </div>
+
+                    <!-- Question Content -->
+                    <div class="mb-4 sm:mb-6">
+                        <h3 id="question-text" class="text-base sm:text-lg md:text-xl font-semibold text-slate-900 leading-relaxed mb-4 sm:mb-6">
+                            Đang tải câu hỏi...
+                        </h3>
+
+                        <!-- Options Container -->
+                        <div id="options-container" class="space-y-2.5 sm:space-y-3">
+                            <!-- Options injected dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Footer within Exam -->
+                <div class="pt-4 sm:pt-6 border-t border-slate-100 flex justify-between items-center gap-2 mt-4 sm:mt-6">
+                    <button onclick="prevQuestion()" id="btn-prev" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 sm:px-5 py-2.5 rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center text-xs sm:text-sm">
+                        <i class="fa-solid fa-arrow-left mr-1.5 sm:mr-2"></i> Câu trước
+                    </button>
+                    <button onclick="nextQuestion()" id="btn-next" class="bg-red-700 hover:bg-red-800 text-white font-semibold px-5 sm:px-6 py-2.5 rounded-xl shadow transition-all flex items-center text-xs sm:text-sm">
+                        Câu sau <i class="fa-solid fa-arrow-right ml-1.5 sm:ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Column: Sidebar (Question Navigation Palette & Submit) -->
+            <div class="w-full lg:w-80 flex-shrink-0 flex flex-col gap-4 sm:gap-6">
+                <div class="bg-white rounded-2xl shadow-md p-4 sm:p-5 border border-slate-200 lg:sticky lg:top-20">
+                    <div class="flex justify-between items-center mb-3 sm:mb-4 pb-3 border-b border-slate-100">
+                        <h4 class="font-bold text-slate-800 text-xs sm:text-sm flex items-center">
+                            <i class="fa-solid fa-table-cells text-red-700 mr-2"></i> Danh sách câu hỏi
+                        </h4>
+                        <span id="answered-count-badge" class="text-xs bg-slate-100 text-slate-600 font-semibold px-2 py-1 rounded-md">0/50 đã làm</span>
+                    </div>
+
+                    <!-- Question Palette Grid -->
+                    <div id="question-palette" class="grid grid-cols-5 gap-1.5 sm:gap-2 max-h-56 sm:max-h-72 overflow-y-auto p-1 custom-scrollbar mb-4">
+                        <!-- Palette buttons injected here -->
+                    </div>
+
+                    <!-- Legend -->
+                    <div class="grid grid-cols-2 gap-2 text-[11px] sm:text-xs text-slate-600 mb-4 sm:mb-5 pt-3 border-t border-slate-100">
+                        <div class="flex items-center"><span class="w-3 h-3 bg-red-700 rounded-sm inline-block mr-1.5 flex-shrink-0"></span> Đã làm</div>
+                        <div class="flex items-center"><span class="w-3 h-3 bg-slate-200 rounded-sm inline-block mr-1.5 flex-shrink-0"></span> Chưa làm</div>
+                        <div class="flex items-center"><span class="w-3 h-3 bg-amber-400 rounded-sm inline-block mr-1.5 flex-shrink-0"></span> Đánh dấu</div>
+                        <div class="flex items-center"><span class="w-3 h-3 border-2 border-red-700 rounded-sm inline-block mr-1.5 flex-shrink-0"></span> Đang xem</div>
+                    </div>
+
+                    <button id="btn-submit-action" onclick="confirmSubmit()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center text-xs sm:text-sm">
+                        <i class="fa-solid fa-paper-plane mr-2"></i> NỘP BÀI
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: RESULT & DETAILED HISTORY SCREEN -->
+        <div id="screen-result" class="hidden flex-col gap-6 w-full max-w-5xl mx-auto">
+            <!-- Top Score Card -->
+            <div class="bg-white rounded-2xl shadow-xl p-5 sm:p-6 md:p-8 border border-slate-200 text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-600 via-amber-500 to-emerald-600"></div>
+                <div class="inline-block bg-red-50 text-red-800 text-[11px] sm:text-xs font-semibold px-3 py-1 rounded-full mb-3 uppercase tracking-wider">
+                    Kết Quả Bài Kiểm Tra
+                </div>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mb-4 sm:mb-6">Tổng Kết Quá Trình Làm Bài</h2>
+
+                <!-- Score Highlight Box -->
+                <div class="bg-slate-900 text-white rounded-2xl p-5 sm:p-6 md:p-8 max-w-md mx-auto mb-6 sm:mb-8 shadow-inner flex flex-col items-center justify-center border border-slate-800">
+                    <span class="text-[11px] sm:text-xs uppercase tracking-widest text-slate-400 mb-1">Điểm Số Của Bạn</span>
+                    <div class="flex items-baseline">
+                        <span id="result-score" class="text-5xl sm:text-6xl md:text-7xl font-black text-yellow-400 tracking-tight">0.0</span>
+                        <span class="text-xl sm:text-2xl font-bold text-slate-400 ml-1">/10</span>
+                    </div>
+                    <div id="result-grade-badge" class="mt-3 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        Xuất sắc
+                    </div>
+                </div>
+
+                <!-- Statistics Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto mb-6 sm:mb-8">
+                    <div class="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-100 text-center">
+                        <span class="text-[11px] sm:text-xs text-slate-500 block mb-1">Số câu đúng</span>
+                        <span id="stat-correct" class="text-xl sm:text-2xl font-bold text-emerald-600">0</span>
+                    </div>
+                    <div class="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-100 text-center">
+                        <span class="text-[11px] sm:text-xs text-slate-500 block mb-1">Số câu sai / trống</span>
+                        <span id="stat-incorrect" class="text-xl sm:text-2xl font-bold text-rose-600">0</span>
+                    </div>
+                    <div class="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-100 text-center">
+                        <span class="text-[11px] sm:text-xs text-slate-500 block mb-1">Thời gian làm bài</span>
+                        <span id="stat-time" class="text-lg sm:text-xl font-bold text-slate-800 font-mono">00:00</span>
+                    </div>
+                    <div class="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-100 text-center">
+                        <span class="text-[11px] sm:text-xs text-slate-500 block mb-1">Tỷ lệ chính xác</span>
+                        <span id="stat-percent" class="text-xl sm:text-2xl font-bold text-indigo-600">0%</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-3 sm:gap-4">
+                    <button onclick="restartExam()" class="bg-red-700 hover:bg-red-800 text-white font-bold px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl shadow transition-all flex items-center text-xs sm:text-sm">
+                        <i class="fa-solid fa-rotate-right mr-2"></i> LÀM BÀI KHÁC
+                    </button>
+                    <button onclick="startReviewWrongExamFromResult()" id="btn-review-wrong-result" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl shadow transition-all flex items-center text-xs sm:text-sm">
+                        <i class="fa-solid fa-rotate-left mr-2"></i> ÔN TẬP LẠI CÂU SAI (<span id="wrong-count-badge-res">0</span>)
+                    </button>
+                    <button onclick="scrollToReview()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl shadow transition-all flex items-center text-xs sm:text-sm">
+                        <i class="fa-solid fa-list-ul mr-2"></i> XEM LẠI CHI TIẾT ĐỀ NÀY
+                    </button>
+                </div>
+            </div>
+
+            <!-- Detailed Review List Section -->
+            <div id="review-section" class="bg-white rounded-2xl shadow-md p-4 sm:p-6 md:p-8 border border-slate-200">
+                <div class="flex flex-wrap justify-between items-center gap-2 mb-4 sm:mb-6 pb-4 border-b border-slate-100">
+                    <h3 class="text-base sm:text-lg font-bold text-slate-900 flex items-center">
+                        <i class="fa-solid fa-clipboard-question text-red-700 mr-2"></i> Xem Lại Chi Tiết 50 Câu Hỏi
+                    </h3>
+                    <div class="flex items-center space-x-2 text-xs">
+                        <span class="flex items-center"><span class="w-3 h-3 bg-emerald-100 border border-emerald-400 rounded-sm mr-1"></span> Đúng</span>
+                        <span class="flex items-center ml-3"><span class="w-3 h-3 bg-rose-100 border border-rose-400 rounded-sm mr-1"></span> Sai</span>
+                    </div>
+                </div>
+
+                <!-- Review Items Container -->
+                <div id="review-container" class="space-y-4 sm:space-y-6">
+                    <!-- Review items injected here -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Custom Modal for Confirmation / Messages -->
+    <div id="custom-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-5 sm:p-6 transform transition-all border border-slate-200">
+            <div class="text-center mb-5">
+                <div id="modal-icon-container" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-red-100 text-red-700 flex items-center justify-center text-xl sm:text-2xl mx-auto mb-3">
+                    <i id="modal-icon" class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <h3 id="modal-title" class="text-base sm:text-lg font-bold text-slate-900">Xác nhận nộp bài</h3>
+                <p id="modal-message" class="text-xs sm:text-sm text-slate-600 mt-1">Bạn có chắc chắn muốn nộp bài thi ngay bây giờ không?</p>
+            </div>
+            <div id="modal-buttons" class="flex space-x-3">
+                <button onclick="closeModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl transition-all text-xs sm:text-sm">Hủy bỏ</button>
+                <button onclick="executeSubmit()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl transition-all text-xs sm:text-sm">Xác nhận nộp</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Full Master Question Bank (270 questions extracted from source file)
+        const masterQuestionBank = [
+            {
+                q: "Năm 1919, Lãnh tụ NAQ gửi đến Hội nghị Véc-xây (France) bản yêu sách nào?",
+                options: [
+                    "Yêu sách của nhân dân An Nam",
+                    "Yêu sách của các dân tộc Á Đông",
+                    "Bản án chế độ thực dân Pháp",
+                    "Yêu sách của những người cùng khổ trên thế giới"
+                ],
+                correct: 0
+            },
+            {
+                q: "Sự kiện nào đánh dấu việc Lãnh tụ NAQ tìm thấy con đường cứu nước?",
+                options: [
+                    "Đọc luận cương của Lê nin về những vấn đề dân tộc và thuộc địa",
+                    "Gửi bản yêu sách tới Hội nghị Véc-xây (Pháp)",
+                    "Sáng lập tổ chức Hội liên hiệp thuộc địa ở Pháp",
+                    "Tham gia sáng lập Đảng Cộng sản Pháp"
+                ],
+                correct: 0
+            },
+            {
+                q: "Phong trào đấu tranh của công nhân Ba Son- Sài Gòn ở Việt Nam (8- 1925):",
+                options: [
+                    "Phong trào đánh dấu mốc chuyển dần tự đấu tranh tự phát sang tự giác của công nhân",
+                    "Phong trào đấu tranh tự phát của công nhân Việt Nam",
+                    "Phong trào đấu tranh đầu tiên của công nhân Việt Nam",
+                    "Phong trào đấu tranh đầu tiên dưới sự lãnh đạo của Quốc tế cộng sản"
+                ],
+                correct: 0
+            },
+            {
+                q: "Tờ báo đầu tiên của Cách mạng Việt Nam theo đường lối vô sản là?",
+                options: [
+                    "Thanh Niên",
+                    "Người cùng khổ",
+                    "Giác ngộ",
+                    "Tiếng dân"
+                ],
+                correct: 0
+            },
+            {
+                q: "Tờ báo nào là cơ quan ngôn luận của Hội Việt Nam Cách mạng thanh niên?",
+                options: [
+                    "Thanh niên",
+                    "Đời sống nhân dân",
+                    "Nhân dân",
+                    "Người cùng khổ"
+                ],
+                correct: 0
+            },
+            {
+                q: "Việc làm nào của lãnh tụ NAQ thể hiện sự chuẩn bị về tư tưởng- chính trị cho việc thành lập Đảng CSVN?",
+                options: [
+                    "Viết báo, xuất bản sách, thành lập các tờ báo nhằm truyền bá Chủ nghĩa Mác- Lê nin vào Việt Nam để giác ngộ quần chúng",
+                    "Thành lập Hội Việt Nam Cách mạng Thanh niên",
+                    "Mở các lớp đào tạo cán bộ cho cách mạng Việt Nam ở Quảng Châu (TQ)",
+                    "Cử cán bộ đi học ở Liên Xô"
+                ],
+                correct: 0
+            },
+            {
+                q: "Các Tổ chức Cộng sản tham gia Hội nghị hợp nhất thành lập Đảng CSVN?",
+                options: [
+                    "Đông Dương Cộng sản đảng, An Nam Cộng sản Đảng",
+                    "Đông Dương Cộng sản đảng, Đông Dương Cộng sản liên đoàn",
+                    "An Nam Cộng sản Đảng, Đông Dương Cộng sản liên đoàn",
+                    "Đông Dương Cộng sản đảng, An Nam Cộng sản Đảng, Đông Dương Cộng sản liên đoàn"
+                ],
+                correct: 0
+            },
+            {
+                q: "Đảng CSVN ra đời 2/1930 là sản phẩm của sự kết hợp giữa?",
+                options: [
+                    "Chủ nghĩa Mác- Lê nin với phong trào công nhân và phong trào yêu nước",
+                    "Chủ nghĩa Mác- Lê nin với phong trào dân tộc, dân chủ",
+                    "Chủ nghĩa Mác- Lê nin với phong trào công nhân và phong trào nông dân",
+                    "Chủ nghĩa Mác- Lê nin với phong trào công nhân"
+                ],
+                correct: 0
+            },
+            {
+                q: "Cương lĩnh chính trị đầu tiên của Đảng CSVN xác định?",
+                options: [
+                    "Cách mạng giải phóng dân tộc Việt Nam phải tiến hành bằng bạo lực cách mạng",
+                    "Tư sản công nghiệp- thương nghiệp và địa chủ đứng về phe đế quốc chống lại cách mạng",
+                    "Tiểu tư sản tri thức thì chỉ theo cách mạng giai đoạn đầu",
+                    "Chỉ các phần tử lao khổ ở đô thị như người bán hàng rong, tri thức thất nghiệp,… mới đi theo cách mạng"
+                ],
+                correct: 0
+            },
+            {
+                q: "Cương lĩnh chính trị đầu tiên của Đảng CSVN xác định?",
+                options: [
+                    "Vấn đề thổ địa là cái cốt của cách mạng tư sản dân quyền",
+                    "Cách mạng Đông Dương là một bộ phận của Cách mạng vô sản thế giới",
+                    "Tư sản công nghiệp- thương nghiệp và địa chủ đứng về phe đế quốc chống lại cách mạng",
+                    "Đánh đổ thực dân Pháp và phong kiến tay sai..."
+                ],
+                correct: 0
+            },
+            {
+                q: "Mâu thuẫn cơ bản của xã hội Việt Nam kể từ khi Pháp xâm lược là gì?",
+                options: [
+                    "Mâu thuẫn giữa dân tộc ta với thực dân Pháp, mâu thuẫn giữa nông dân với địa chủ phong kiến",
+                    "Mâu thuẫn giữa công nhân với tư bản, mâu thuẫn giữa nông dân với địa chủ phong kiến",
+                    "Mâu thuẫn giữa nông dân với địa chủ phong kiến, mâu thuẫn giữa tư sản với vô sản",
+                    "Mâu thuẫn giữa nông dân, công nhân với địa chủ phong kiến"
+                ],
+                correct: 0
+            },
+            {
+                q: "Ở Việt Nam, giai cấp mới nào đã ra đời dưới tác động của cuộc khai thác thuộc địa lần thứ nhất (1897 - 1914) của thực dân Pháp?",
+                options: [
+                    "Công nhân",
+                    "Tư sản",
+                    "Nông dân",
+                    "Tiểu tư sản"
+                ],
+                correct: 0
+            },
+            {
+                q: "Trước khi thực dân Pháp nổ súng xâm lược (1858), xã hội Việt Nam có những giai cấp cơ bản nào?",
+                options: [
+                    "Địa chủ phong kiến và nông dân",
+                    "Địa chủ phong kiến và công nhân",
+                    "Công nhân và nông dân",
+                    "Nông dân và tri thức"
+                ],
+                correct: 0
+            },
+            {
+                q: "Các phong trào yêu nước ở Việt Nam trước khi có Đảng Cộng sản lãnh đạo có điểm chung là:",
+                options: [
+                    "Không có đường lối rõ ràng dẫn đến thất bại và bị thực dân Pháp đàn áp một cách nặng nề",
+                    "Không nhận được sự ủng hộ của người dân, đặc biệt là giai cấp công - nông",
+                    "Không thông qua ý kiến của Quốc tế Cộng sản, đặc biệt Đảng Cộng sản Liên Xô",
+                    "Không có đủ tiềm lực tài chính và người đứng đầu lãnh đạo cách mạng"
+                ],
+                correct: 0
+            },
+            {
+                q: "Thực dân Pháp đã thực hiện chính sách gì về văn hoá xã hội để cai trị nước ta?",
+                options: [
+                    "Ngu dân",
+                    "Bế quan toả cảng",
+                    "Đốt sách chôn Nho",
+                    "Chia để trị"
+                ],
+                correct: 0
+            },
+            {
+                q: "Tầng lớp tư sản mại bản của Việt Nam dưới thời Pháp thuộc có đặc điểm là:",
+                options: [
+                    "Có sự tham gia vào đời sống chính trị, kinh tế của chính quyền thực dân Pháp",
+                    "Có tiềm lực kinh tế mạnh, là giai cấp đông đảo nhất trong xã hội",
+                    "Không có tư liệu sản xuất, phải bán sức lao động trong các nhà máy, xí nghiệp",
+                    "Chịu ba tầng áp bức, bóc lột: đế quốc, phong kiến và tư sản dân tộc"
+                ],
+                correct: 0
+            },
+            {
+                q: "Vì sao tầng lớp tiểu tư sản lại không thể là lực lượng lãnh đạo cách mạng chống Pháp?",
+                options: [
+                    "Vì địa vị kinh tế của họ bấp bênh, thái độ hay dao động",
+                    "Vì địa vị kinh tế, chính trị của họ gắn chặt với Pháp",
+                    "Vì lực lượng này hoàn toàn không có mâu thuẫn về quyền lợi với thực dân Pháp",
+                    "Vì lực lượng này nhận được nhiều cảm tình của thực dân Pháp"
+                ],
+                correct: 0
+            },
+            {
+                q: "Cuối thế kỷ XIX - đầu thế kỷ XX, nhiệm vụ hàng đầu cần phải được giải quyết cấp thiết của cách mạng Việt Nam là:",
+                options: [
+                    "Giải phóng dân tộc",
+                    "Đấu tranh giai cấp",
+                    "Canh tân đất nước",
+                    "Chia lại ruộng đất"
+                ],
+                correct: 0
+            },
+            {
+                q: "Sự kiện nào đã đánh dấu phong trào công nhân Việt Nam hoàn toàn trở thành một phong trào tự giác?",
+                options: [
+                    "Năm 1930, khi Đảng Cộng sản Việt Nam ra đời",
+                    "Năm 1920, khi tổ chức công hội ở Sài Gòn được thành lập",
+                    "Năm 1925, khi cuộc bãi công ở nhà máy Ba Son diễn ra rầm rộ",
+                    "Năm 1929, khi có sự ra đời của ba tổ chức cộng sản"
+                ],
+                correct: 0
+            },
+            {
+                q: "Sự kiện nào được Nguyễn Ái Quốc đánh giá “như chim én nhỏ báo hiệu mùa xuân”?",
+                options: [
+                    "Vụ mưu sát viên toàn quyền Méc-Lanh của Phạm Hồng Thái (1924)",
+                    "Cách mạng Tháng Mười Nga bùng nổ và thắng lợi (1917)",
+                    "Sự thành lập Đảng Cộng sản Pháp (1920)",
+                    "Sự ra đời của Hội Việt Nam cách mạng Thanh niên (1925)"
+                ],
+                correct: 0
+            },
+            {
+                q: "Phong trào đình công, bãi công của công nhân Việt Nam trong những năm (1926 - 1929) thuộc khuynh hướng nào?",
+                options: [
+                    "Khuynh hướng vô sản",
+                    "Khuynh hướng phong kiến",
+                    "Khuynh hướng dân chủ tư sản",
+                    "Khuynh hướng dân chủ"
+                ],
+                correct: 0
+            },
+            {
+                q: "Ai là người đại diện cho chủ trương đánh đuổi thực dân Pháp giành độc lập dân tộc, khôi phục chủ quyền quốc gia bằng biện pháp bạo động?",
+                options: [
+                    "Phan Bội Châu",
+                    "Bùi Quang Chiêu",
+                    "Phan Châu Trinh",
+                    "Nguyễn Ái Quốc"
+                ],
+                correct: 0
+            },
+            {
+                q: "Sự kiện nào đánh dấu bước ngoặt trong cuộc đời hoạt động cách mạng của Nguyễn Ái Quốc - từ người yêu nước trở thành người cộng sản?",
+                options: [
+                    "Đọc bản Sơ thảo lần thứ nhất những luận cương về vấn đề dân tộc và vấn đề thuộc địa của Lênin",
+                    "Bỏ phiếu tán thành việc gia nhập Quốc tế III và tham gia thành lập Đảng Cộng sản Pháp",
+                    "Gửi Bản yêu sách của nhân dân An Nam tới Hội nghị Véc-xây",
+                    "Ra đi tìm đường cứu nước"
+                ],
+                correct: 0
+            },
+            {
+                q: "Hội Liên hiệp các dân tộc thuộc địa có cơ quan ngôn luận là tờ báo nào?",
+                options: [
+                    "Người cùng khổ",
+                    "Thanh niên",
+                    "Cờ đỏ",
+                    "Độc lập"
+                ],
+                correct: 0
+            },
+            {
+                q: "Nguyễn Ái Quốc đã đọc bản Sơ thảo lần thứ nhất những luận cương về vấn đề dân tộc và vấn đề thuộc địa của Lênin đăng trên báo Nhân đạo vào năm:",
+                options: [
+                    "1920",
+                    "1919",
+                    "1921",
+                    "1922"
+                ],
+                correct: 0
+            },
+            {
+                q: "Phong trào cách mạng Việt Nam vào cuối năm 1928, đầu năm 1929 đã hình thành làn sóng cách mạng nào dưới đây?",
+                options: [
+                    "Cách mạng dân tộc, dân chủ",
+                    "Cách mạng tư sản dân quyền",
+                    "Cách mạng văn hoá",
+                    "Cách mạng tư sản"
+                ],
+                correct: 0
+            },
+            {
+                q: "Khẩu hiệu “Không thành công thì cũng thành nhân” được sử dụng trong cuộc khởi nghĩa nào dưới đây?",
+                options: [
+                    "Yên Bái",
+                    "Ba Đình",
+                    "Bãi Sậy",
+                    "Hương Khê"
+                ],
+                correct: 0
+            },
+            {
+                q: "Tác phẩm nào của Nguyễn Ái Quốc đã vạch rõ âm mưu và thủ đoạn của chủ nghĩa đế quốc che giấu tội ác dưới cái vỏ bọc “khai hoá văn minh”?",
+                options: [
+                    "Bản án chế độ thực dân Pháp",
+                    "Đường Kách mệnh",
+                    "Nhật ký trong tù",
+                    "Con rồng tre"
+                ],
+                correct: 0
+            },
+            {
+                q: "Hoạt động nào dưới đây của Nguyễn Ái Quốc có ý nghĩa là sự chuẩn bị về mặt tổ chức cho việc thành lập Đảng Cộng sản Việt Nam?",
+                options: [
+                    "Mở các lớp huấn luyện chính trị nhằm đào tạo cán bộ cho cách mạng Việt Nam (từ năm 1925 -1927)",
+                    "Chủ trì Hội nghị hợp nhất các tổ chức cộng sản (2/1930)",
+                    "Tham gia sáng lập Đảng Cộng sản Pháp (12/1920)",
+                    "Thành lập Hội Việt Nam Cách mạng Thanh niên (6/1925)"
+                ],
+                correct: 3
+            },
+            {
+                q: "Cơ quan ngôn luận của Hội Việt Nam Cách mạng Thanh niên là tờ báo nào?",
+                options: [
+                    "Thanh niên",
+                    "Người cùng khổ",
+                    "Lao động",
+                    "Công nhân"
+                ],
+                correct: 0
+            },
+            {
+                q: "Sự kiện nào đánh dấu giai cấp công nhân Việt Nam đã bước đầu đi vào đấu tranh tự giác?",
+                options: [
+                    "Bãi công của thợ máy xưởng Ba Son cảng Sài Gòn (1925)",
+                    "Bãi công của công nhân thợ nhuộm Sài Gòn - Chợ Lớn (1922)",
+                    "Tổng bãi công của công nhân Bắc Kỳ (1922)",
+                    "Bãi công của công nhân nhà máy sợi Nam Định (1930)"
+                ],
+                correct: 0
+            },
+            {
+                q: "Tác phẩm nào dưới đây của Nguyễn Ái Quốc đã đề cập đến những vấn đề cơ bản của một cương lĩnh chính trị, chuẩn bị về tư tưởng, chính trị cho việc thành lập Đảng?",
+                options: [
+                    "Đường Kách mệnh (1927)",
+                    "Bản án chế độ thực dân Pháp (1925)",
+                    "Đông Dương (1924)",
+                    "Nhật ký trong tù (1943)"
+                ],
+                correct: 0
+            },
+            {
+                q: "Tính chất và nhiệm vụ của cách mạng Việt Nam được thể hiện trong tác phẩm “Đường Kách mệnh” của Nguyễn Ái Quốc là:",
+                options: [
+                    "Cách mạng giải phóng dân tộc mở đường tiến lên chủ nghĩa xã hội",
+                    "Tư sản dân quyền và thổ địa cách mạng để đi tới xã hội cộng sản",
+                    "Canh tân đất nước theo xu hướng của Minh Trị duy tân ở Nhật",
+                    "Cách mạng xã hội chủ nghĩa để đi lên xã hội cộng sản"
+                ],
+                correct: 0
+            },
+            {
+                q: "Chi bộ Cộng sản thành lập ở Bắc Kỳ tháng 3/1929 nhằm mục đích gì?",
+                options: [
+                    "Chuẩn bị thành lập một đảng cộng sản thay thế Hội Việt Nam Cách mạng Thanh niên",
+                    "Củng cố ảnh hưởng của Hội Việt Nam Cách mạng Thanh niên",
+                    "Xây dựng đội ngũ cán bộ cho cách mạng, chuẩn bị Đại hội Đảng",
+                    "Thành lập Đội Việt Nam tuyên truyền giải phóng quân"
+                ],
+                correct: 0
+            },
+            {
+                q: "Tổ chức nào được Nguyễn Ái Quốc thành lập tại Quảng Châu (Trung Quốc) vào tháng 6/1925?",
+                options: [
+                    "Hội Việt Nam Cách mạng Thanh niên",
+                    "Tâm tâm xã",
+                    "Hội Việt Nam Cách mạng đồng minh",
+                    "Hội Liên hiệp thuộc địa"
+                ],
+                correct: 0
+            },
+            {
+                q: "Tổ chức cộng sản nào ra đời đầu tiên ở Việt Nam?",
+                options: [
+                    "Đông Dương Cộng sản Đảng",
+                    "Hội Việt Nam Cách mạng Thanh niên",
+                    "An Nam Cộng sản Đảng",
+                    "Đông Dương Cộng sản Liên đoàn"
+                ],
+                correct: 0
+            },
+            {
+                q: "Đông Dương Cộng sản Đảng và An Nam Cộng sản Đảng được ra đời từ tổ chức tiền thân nào dưới đây?",
+                options: [
+                    "Hội Việt Nam Cách mạng Thanh niên",
+                    "Tân Việt Cách mạng Đảng",
+                    "Việt Nam Cách mạng đồng chí Hội",
+                    "Tâm tâm xã"
+                ],
+                correct: 0
+            },
+            {
+                q: "Ý nghĩa của phong trào Vô sản hoá do Hội Việt Nam Cách mạng Thanh niên phát động vào năm 1928 là:",
+                options: [
+                    "Truyền bá tư tưởng vô sản, xây dựng, phát triển tổ chức của công nhân",
+                    "Khuyến khích công nhân mít-tinh, biểu tình, đập phá máy móc, nhà xưởng",
+                    "Truyền bá chủ nghĩa Mác - Lênin vào trong giai cấp nông dân",
+                    "Giúp cho giai cấp nông dân nhận ra sứ mệnh lãnh đạo cách mạng của mình"
+                ],
+                correct: 0
+            },
+            {
+                q: "Sự ra đời của ba tổ chức cộng sản diễn ra trong vòng nửa cuối năm 1929 đã khẳng định điều gì?",
+                options: [
+                    "Cách mạng Việt Nam đã có bước phát triển về chất, phù hợp với yêu cầu của lịch sử",
+                    "Cách mạng Việt Nam đã vượt qua khủng hoảng về đường lối lãnh đạo",
+                    "Cách mạng Việt Nam đã đủ mạnh để đương đầu với thực dân Pháp",
+                    "Cách mạng Việt Nam đã trở thành một bộ phận của cách mạng thế giới"
+                ],
+                correct: 0
+            },
+            {
+                q: "Trước tình hình các tổ chức cộng sản hoạt động biệt lập, bài xích lẫn nhau đã dẫn đến một yêu cầu bức thiết cho cách mạng Việt Nam lúc đó là:",
+                options: [
+                    "Thống nhất các tổ chức cộng sản",
+                    "Giải tán các tổ chức cộng sản",
+                    "Giảng hoà sự bài xích, biệt lập giữa các tổ chức cộng sản",
+                    "Kiểm điểm nghiêm túc các tổ chức cộng sản"
+                ],
+                correct: 0
+            },
+            {
+                q: "Trong Cương lĩnh chính trị đầu tiên, Đảng xác định mục tiêu chiến lược của cách mạng Việt Nam là gì?",
+                options: [
+                    "Dân quyền cách mạng và thổ địa cách mạng để đi tới xã hội cộng sản",
+                    "Xã hội chủ nghĩa và thổ địa cách mạng",
+                    "Dân tộc dân chủ và thổ địa cách mạng",
+                    "Độc lập dân tộc và người cày có ruộng"
+                ],
+                correct: 0
+            },
+            {
+                q: "Cương lĩnh chính trị đầu tiên của Đảng được thông qua tại Hội nghị thành lập Đảng Cộng sản Việt Nam ngày 3/2/1930 đã xác định giai cấp nào là lực lượng lãnh đạo cách mạng?",
+                options: [
+                    "Giai cấp công nhân",
+                    "Giai cấp tư sản",
+                    "Giai cấp nông dân",
+                    "Giai cấp địa chủ"
+                ],
+                correct: 0
+            },
+            {
+                q: "Sự kiện nào được Nguyễn Ái Quốc đánh giá “giai cấp vô sản ta đã trưởng thành và đủ sức lãnh đạo cách mạng”?",
+                options: [
+                    "Hội nghị Thành lập Đảng Cộng sản Việt Nam (1930)",
+                    "Chi bộ Cộng sản đầu tiên của Việt Nam ra đời (1929)",
+                    "Thành lập tổ chức Công hội đỏ Bắc Kỳ (1929)",
+                    "Sự ra đời của ba tổ chức Cộng sản (1929)"
+                ],
+                correct: 0
+            },
+            {
+                q: "Hai văn kiện nào dưới đây được coi như là Cương lĩnh chính trị đầu tiên của Đảng Cộng sản Việt Nam?",
+                options: [
+                    "Chánh cương vắn tắt và Sách lược vắn tắt của Đảng",
+                    "Chánh cương vắn tắt và Lời kêu gọi của Đảng",
+                    "Sách lược vắn tắt và Lời kêu gọi của Đảng",
+                    "Sách lược vắn tắt và Chương trình tóm tắt của Đảng"
+                ],
+                correct: 0
+            },
+            {
+                q: "Đại hội VII của Quốc tế Cộng sản (7/1935) đã vạch ra nhiệm vụ trước mắt của giai cấp công nhân và nhân dân lao động thế giới là:",
+                options: [
+                    "Đấu tranh chống chủ nghĩa phát-xít, chống chiến tranh, bảo vệ dân chủ và hòa bình",
+                    "Giành lại ruộng đất cho nông dân từ tay giai cấp tư sản ở các nước thuộc địa",
+                    "Đấu tranh chống lại nạn bóc lột sức lao động trẻ em ở các nước thuộc địa",
+                    "Loại bỏ giai cấp tư sản ra khỏi lực lượng cách mạng"
+                ],
+                correct: 0
+            },
+            {
+                q: "Điều kiện nào tạo ra khả năng đấu tranh công khai, hợp pháp cho phong trào cách mạng Đông Dương giai đoạn 1936 - 1939?",
+                options: [
+                    "Mặt trận nhân dân Pháp lên cầm quyền ở Đông Dương",
+                    "Sự xuất hiện chủ nghĩa tư bản và nguy cơ Chiến tranh Thế giới thứ nhất",
+                    "Đảng Cộng sản Pháp giao quyền cai trị Việt Nam cho Nhật",
+                    "Chiến tranh Thế giới thứ hai kết thúc, phe phát-xít lên cầm quyền ở Đông Dương"
+                ],
+                correct: 0
+            },
+            {
+                q: "Nhiệm vụ của cách mạng Việt Nam được Đảng ta xác định trong thời kỳ 1936 - 1939 là:",
+                options: [
+                    "Chống phát-xít, chống chiến tranh đế quốc, chống bọn phản động thuộc địa, đòi tự do, dân chủ, cơm áo hòa bình",
+                    "Đánh đuổi quân đội Tưởng Giới Thạch và các phe phái phản động ở trong nước",
+                    "Tịch thu ruộng đất của địa chủ phong kiến chia cho dân cày",
+                    "Đàm phán thông qua ngoại giao với thực dân Pháp để giành lại độc lập dân tộc"
+                ],
+                correct: 0
+            },
+            {
+                q: "Hình thức đấu tranh mới xuất hiện trong phong trào dân chủ 1936 - 1939 ở Việt Nam là:",
+                options: [
+                    "Đấu tranh nghị trường",
+                    "Mít-tinh biểu tình",
+                    "Đấu tranh chính trị",
+                    "Bãi khoá, bãi công"
+                ],
+                correct: 0
+            },
+            {
+                q: "Chủ trương và nhận thức mới của Đảng trong những năm 1936 - 1939 đã xác định kẻ thù nguy hại trước mắt của nhân dân Đông Dương là:",
+                options: [
+                    "Phản động thuộc địa và bè lũ tay sai",
+                    "Chủ nghĩa phát-xít và phong kiến tay sai",
+                    "Chủ nghĩa đế quốc và phong kiến",
+                    "Phong kiến và tư sản mại bản"
+                ],
+                correct: 0
+            },
+            {
+                q: "Đâu được coi là cuộc diễn tập lần thứ hai chuẩn bị cho Cách mạng Tháng Tám năm 1945 ở Việt Nam?",
+                options: [
+                    "Cuộc vận động dân chủ 1936 - 1939",
+                    "Phong trào cách mạng 1930 - 1931",
+                    "Cuộc vận động giải phóng dân tộc 1939 - 1945",
+                    "Cao trào kháng Nhật cứu nước"
+                ],
+                correct: 0
+            },
+            {
+                q: "Trong giai đoạn 1939 - 1945, nhiệm vụ của cách mạng Việt Nam được Đảng ta đưa lên hàng đầu là gì?",
+                options: [
+                    "Giải phóng dân tộc",
+                    "Đòi quyền dân chủ",
+                    "Đánh đổ phong kiến",
+                    "Đánh đổ tư sản"
+                ],
+                correct: 0
+            },
+            {
+                q: "Khi chiến tranh Thế giới Thứ hai bùng nổ, thực dân Pháp đã thi hành chính sách gì ở Việt Nam?",
+                options: [
+                    "Kinh tế thuộc địa thời chiến",
+                    "Kinh tế thời chiến",
+                    "Kinh tế chỉ huy",
+                    "Kinh tế hàng hoá"
+                ],
+                correct: 2
+            },
+            {
+                q: "Chính sách nào của Nhật - Pháp đã gây ra nạn đói lớn ở Việt Nam cuối năm 1944 - đầu năm 1945?",
+                options: [
+                    "Bắt người dân nhổ lúa, trồng đay lấy nguyên liệu phục vụ chiến tranh",
+                    "Xuất khẩu các nguyên liệu chiến lược sang Nhật Bản",
+                    "Đầu tư vào những ngành công nghiệp phục vụ quân sự",
+                    "Kiểm soát toàn bộ hệ thống đường sá"
+                ],
+                correct: 0
+            },
+            {
+                q: "Tại Hội Nghị Trung ương Đảng lần thứ VIII (5/1941), Nguyễn Ái Quốc đã chủ trương thành lập mặt trận nào?",
+                options: [
+                    "Mặt trận Việt Minh",
+                    "Mặt trận Liên Việt",
+                    "Mặt trận Đồng Minh",
+                    "Mặt trận Dân tộc thống nhất phản đế Đông Dương"
+                ],
+                correct: 0
+            },
+            {
+                q: "Đội Việt Nam tuyên truyền giải phóng quân ra đời vào thời gian nào?",
+                options: [
+                    "22/12/1944",
+                    "19/12/1946",
+                    "03/02/1930",
+                    "02/09/1945"
+                ],
+                correct: 0
+            },
+            {
+                q: "Chỉ thị Nhật - Pháp bắn nhau và hành động của chúng ta (3/1945) đã xác định kẻ thù cụ thể trước mắt, duy nhất của nhân dân Đông Dương là:",
+                options: [
+                    "Quân Nhật",
+                    "Thực dân Pháp",
+                    "Phát-xít Nhật và thực dân Pháp",
+                    "Quân Tưởng Giới Thạch"
+                ],
+                correct: 0
+            },
+            {
+                q: "Sự kiện nào dưới đây đã tạo ra thời cơ thuận lợi cho nhân dân ta giành lại độc lập vào tháng 8/1945?",
+                options: [
+                    "Sự đầu hàng vô điều kiện của phát-xít Nhật",
+                    "Sự thất bại của phe phát-xít tại chiến trường châu Mỹ",
+                    "Sự thất bại của Hồng quân Liên Xô tại mặt trận Xô-Đức",
+                    "Sự nổi dậy giành thắng lợi của nhân dân các nước Tây Âu"
+                ],
+                correct: 0
+            },
+            {
+                q: "Đảng đã xác định thời cơ “ngàn năm có một” của Cách mạng Tháng Tám năm 1945 tồn tại trong khoảng thời gian nào?",
+                options: [
+                    "Từ sau khi Nhật đầu hàng Đồng minh đến trước khi quân Đồng minh vào Đông Dương",
+                    "Từ sau khi Nhật đầu hàng Đồng minh đến khi quân Đồng minh vào Đông Dương",
+                    "Từ sau khi quân Đồng minh vào Đông Dương đến trước khi quân Nhật đầu hàng Đồng minh",
+                    "Từ trước khi Nhật đầu hàng Đồng minh đến sau khi quân Đồng minh vào Đông Dương"
+                ],
+                correct: 0
+            },
+            {
+                q: "Phương pháp đấu tranh cơ bản trong Cách mạng Tháng Tám năm 1945 là:",
+                options: [
+                    "Đấu tranh chính trị kết hợp với đấu tranh vũ trang",
+                    "Đấu tranh chính trị kết hợp với đấu tranh báo chí",
+                    "Đấu tranh vũ trang kết hợp với đấu tranh ngoại giao",
+                    "Đấu tranh chính trị kết hợp với đấu tranh nghị trường"
+                ],
+                correct: 0
+            },
+            {
+                q: "Theo giáo trình môn Lịch sử Đảng Cộng sản Việt Nam, nhân tố nào được xem là nhân tố chủ yếu, quyết định thắng lợi của Cách mạng Tháng Tám năm 1945?",
+                options: [
+                    "Sự lãnh đạo của Đảng",
+                    "Liên minh công - nông",
+                    "Bối cảnh quốc tế thuận lợi",
+                    "Thành lập mặt trận dân tộc thống nhất"
+                ],
+                correct: 0
+            },
+            {
+                q: "Sau Cách mạng Tháng Tám năm 1945, kẻ thù nguy hiểm nhất của nước ta là:",
+                options: [
+                    "Thực dân Pháp",
+                    "Quân đội Tưởng Giới Thạch",
+                    "Thực dân Anh",
+                    "Phát-xít Nhật"
+                ],
+                correct: 0
+            },
+            {
+                q: "Đâu là âm mưu của quân đội Tưởng Giới Thạch và lực lượng tay sai khi kéo quân vào miền Bắc Việt Nam dưới danh nghĩa giải giáp quân Nhật?",
+                options: [
+                    "Diệt Cộng, cầm Hồ",
+                    "Dùng Việt Nam làm bàn đạp để thực hiện xâm lược Campuchia",
+                    "Giúp đỡ thực dân Pháp quay trở lại xâm lược Việt Nam",
+                    "Ngăn chặn quân Anh tiến ra miền Bắc"
+                ],
+                correct: 0
+            },
+            {
+                q: "Điền từ còn thiếu vào chỗ trống: “Một dân tộc dốt là một dân tộc ……Vì vậy tôi đề nghị mở một chiến dịch chống nạn mù chữ.”",
+                options: [
+                    "Yếu",
+                    "Nghèo",
+                    "Lạc hậu",
+                    "Mờ tối"
+                ],
+                correct: 0
+            },
+            {
+                q: "Nha Bình dân học vụ được thành lập vào năm nào?",
+                options: [
+                    "1945",
+                    "1946",
+                    "1947",
+                    "1948"
+                ],
+                correct: 0
+            },
+            {
+                q: "Cuộc Tổng tuyển cử toàn quốc đầu tiên của nước Việt Nam Dân chủ Cộng hoà được diễn ra vào thời gian nào?",
+                options: [
+                    "6/1/1946",
+                    "5/1/1945",
+                    "7/1/1947",
+                    "8/1/1948"
+                ],
+                correct: 0
+            },
+            {
+                q: "Hiệp ước Hoa - Pháp đã được ký kết vào năm nào?",
+                options: [
+                    "1946",
+                    "1945",
+                    "1947",
+                    "1944"
+                ],
+                correct: 0
+            },
+            {
+                q: "Ngày 6/3/1946, Chủ tịch Hồ Chí Minh đã ký với Pháp văn bản nào?",
+                options: [
+                    "Hiệp định sơ bộ",
+                    "Tạm ước",
+                    "Tạm ước sơ bộ",
+                    "Hiệp ước chính thức"
+                ],
+                correct: 0
+            },
+            {
+                q: "Tại Hà Nội, cuộc kháng chiến toàn quốc bắt đầu bằng sự kiện nào?",
+                options: [
+                    "Loạt đại bác bắn vào thành Hà Nội từ pháo đài Láng",
+                    "Pháp đơn phương tuyên bố cắt đứt liên hệ với Chính phủ Việt Nam",
+                    "Hồ Chí Minh ra lời kêu gọi Toàn quốc kháng chiến",
+                    "Quân Pháp tấn công vào Đại Nội Huế"
+                ],
+                correct: 0
+            },
+            {
+                q: "Cuộc kháng chiến toàn quốc tại mặt trận Hà Nội (1946) kéo dài trong bao nhiêu ngày đêm?",
+                options: [
+                    "60 ngày đêm",
+                    "54 ngày đêm",
+                    "72 ngày đêm",
+                    "80 ngày đêm"
+                ],
+                correct: 0
+            },
+            {
+                q: "Đâu là phương châm kháng chiến được Đảng đề ra trong cuộc kháng chiến chống Pháp, giai đoạn 1945 - 1947?",
+                options: [
+                    "Dựa trên sức mạnh toàn dân, tiến hành kháng chiến toàn dân, toàn diện, lâu dài và dựa vào sức mình là chính",
+                    "Dựa trên sức mạnh toàn dân, tiến hành kháng chiến đánh nhanh, thắng nhanh",
+                    "Chiến đấu cầm chừng, tiến hành kháng chiến đánh chắc, tiến chắc",
+                    "Chiến đấu cầm chừng, tranh thủ thời gian xây dựng và phát triển kinh tế"
+                ],
+                correct: 0
+            },
+            {
+                q: "Chiến thắng trong Chiến dịch Biên giới Thu Đông năm 1950 có ý nghĩa lớn với cách mạng Việt Nam bởi vì:",
+                options: [
+                    "Kết thúc thời kì chiến đấu trong vòng vây",
+                    "Pháp phải trao trả lại các vùng tạm chiếm cho quân đội Việt Nam",
+                    "Đóng cửa hoàn toàn biên giới Việt Trung",
+                    "Việt Nam được giải phóng hoàn toàn"
+                ],
+                correct: 0
+            },
+            {
+                q: "Đại hội đại biểu toàn quốc lần thứ II của Đảng (2/1951) đã quyết định việc Đảng ra hoạt động công khai và lấy tên là:",
+                options: [
+                    "Đảng Lao động Việt Nam",
+                    "Đảng Cộng sản Việt Nam",
+                    "Đảng Cộng sản Đông Dương",
+                    "Đông Dương Cộng sản Đảng"
+                ],
+                correct: 0
+            },
+            {
+                q: "Trận Điện Biên Phủ (7/1954) thắng lợi đã mang lại ý nghĩa rất lớn không chỉ đối với cách mạng Việt Nam, mà còn cả đối với cách mạng thế giới vì:",
+                options: [
+                    "Báo hiệu sự thắng lợi của nhân dân các dân tộc bị áp bức, sự sụp đổ của chủ nghĩa thực dân",
+                    "Báo hiệu sự sụp đổ không thể tránh khỏi của chủ nghĩa tư bản",
+                    "Làm sụp đổ hệ thống phát-xít ở các nước châu Âu",
+                    "Giúp các quốc gia tư bản ở Châu Á - Âu - Mỹ Latinh tự giải phóng cho mình"
+                ],
+                correct: 0
+            },
+            {
+                q: "Bản Hiệp định đình chỉ chiến sự ở Việt Nam (Hiệp định Giơ-ne-vơ) đã được các bên đồng ý kí kết vào thời gian nào?",
+                options: [
+                    "21/7/1954",
+                    "27/1/1954",
+                    "21/1/1954",
+                    "27/7/1954"
+                ],
+                correct: 0
+            },
+            {
+                q: "Hình thức “Đồng Khởi” của nhân dân miền Nam (1960) lần đầu tiên diễn ra ở tỉnh nào?",
+                options: [
+                    "Bến Tre",
+                    "Cà Mau",
+                    "Tiền Giang",
+                    "Cần Thơ"
+                ],
+                correct: 0
+            },
+            {
+                q: "Thắng lợi của phong trào Đồng khởi (1960) có ý nghĩa như thế nào đối với cách mạng miền Nam?",
+                options: [
+                    "Chuyển cách mạng miền Nam từ thế giữ gìn lực lượng sang thế tiến công",
+                    "Khiến cho Mỹ phải xuống thang chiến tranh ở miền Nam",
+                    "Khiến cho Mỹ phải rút quân ra khỏi miền Nam Việt Nam",
+                    "Chuyển cách mạng miền Nam sang lối đánh thần tốc, táo bạo"
+                ],
+                correct: 0
+            },
+            {
+                q: "Đại hội đại biểu toàn quốc lần thứ III (9/1960) của Đảng họp ở đâu?",
+                options: [
+                    "Hà Nội",
+                    "Tuyên Quang",
+                    "Hà Giang",
+                    "Bắc Ninh"
+                ],
+                correct: 0
+            },
+            {
+                q: "Chiến lược “Chiến tranh đặc biệt” của đế quốc Mỹ ở miền Nam đã diễn ra trong thời gian nào?",
+                options: [
+                    "1961 - 1965",
+                    "1965 - 1968",
+                    "1969 - 1973",
+                    "1954 - 1960"
+                ],
+                correct: 0
+            },
+            {
+                q: "Hiệp định về chấm dứt chiến tranh, lập lại hoà bình ở Việt Nam (Hiệp định Pa-ri) đã được kí kết vào thời gian nào?",
+                options: [
+                    "27/1/1973",
+                    "21/7/1973",
+                    "21/7/1954",
+                    "27/1/1954"
+                ],
+                correct: 0
+            },
+            {
+                q: "Cuộc tổng tiến công và nổi dậy mùa Xuân năm 1975 bắt đầu bằng chiến dịch nào?",
+                options: [
+                    "Chiến dịch Tây Nguyên",
+                    "Chiến dịch Huế - Đà Nẵng",
+                    "Chiến dịch đường số 14",
+                    "Chiến dịch Hồ Chí Minh"
+                ],
+                correct: 0
+            },
+            {
+                q: "Thành phố Sài Gòn được đổi tên là Thành phố Hồ Chí Minh vào năm nào?",
+                options: [
+                    "Năm 1976",
+                    "Năm 1945",
+                    "Năm 1954",
+                    "Năm 1990"
+                ],
+                correct: 0
+            },
+            {
+                q: "Đại hội VI của Đảng (12/1986) đã đề ra đường lối đổi mới toàn diện đất nước. Ba chương trình kinh tế lớn được đề ra bao gồm:",
+                options: [
+                    "Hàng lương thực - thực phẩm, hàng tiêu dùng và hàng xuất khẩu",
+                    "Hàng lương thực - thực phẩm, hàng tiêu dùng và hàng nhập khẩu",
+                    "Hàng lương thực - thực phẩm, hàng sản xuất và hàng xuất khẩu",
+                    "Hàng lương thực - thực phẩm, hàng sản xuất và hàng nhập khẩu"
+                ],
+                correct: 0
+            },
+            {
+                q: "Việt Nam chính thức trở thành thành viên thứ 150 của Tổ chức thương mại thế giới (WTO) vào năm nào?",
+                options: [
+                    "2006",
+                    "2000",
+                    "2002",
+                    "2004"
+                ],
+                correct: 0
+            },
+            {
+                q: "Cơ chế vận hành của hệ thống chính trị ở nước ta hiện nay là:",
+                options: [
+                    "Đảng lãnh đạo, Nhà nước quản lý, nhân dân làm chủ",
+                    "Chính phủ lãnh đạo, Nhà nước quản lý, Đảng làm chủ",
+                    "Chính phủ lãnh đạo, người dân quản lý, Nhà nước làm chủ",
+                    "Đảng lãnh đạo, nhân dân quản lý, Nhà nước làm chủ"
+                ],
+                correct: 0
+            }
+        ];
+
+        // App State Variables
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let userAnswers = {}; // questionIndex -> selectedOptionIndex
+        let flaggedQuestions = new Set();
+        let timerInterval = null;
+        let timeLeft = 60 * 60; // 60 minutes in seconds
+        let examStartTime = null;
+        let examSubmitted = false;
+        let currentMode = 'exam'; // 'exam' (Thi chính thức), 'review' (Ôn tập hiện đáp án), 'review-wrong' (Ôn tập câu sai)
+
+        // Local Storage History Management Key
+        const STORAGE_KEY = "history_dang_history_exam_data";
+        const WRONG_QUESTIONS_KEY = "history_dang_wrong_questions_data";
+
+        // Load and render history on startup
+        window.addEventListener('DOMContentLoaded', () => {
+            renderDeviceHistory();
+            updateWrongQuestionsCountUI();
+        });
+
+        function getSavedHistory() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function getWrongQuestions() {
+            try {
+                const data = localStorage.getItem(WRONG_QUESTIONS_KEY);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveWrongQuestions(wrongList) {
+            try {
+                const existing = getWrongQuestions();
+                const existingMap = new Map(existing.map(item => [item.q, item]));
+                
+                wrongList.forEach(item => {
+                    existingMap.set(item.q, item);
+                });
+
+                localStorage.setItem(WRONG_QUESTIONS_KEY, JSON.stringify(Array.from(existingMap.values())));
+            } catch (e) {}
+            updateWrongQuestionsCountUI();
+        }
+
+        function updateWrongQuestionsCountUI() {
+            const wrongList = getWrongQuestions();
+            const count = wrongList.length;
+            const badgeWel = document.getElementById('wrong-count-badge-wel');
+            const badgeRes = document.getElementById('wrong-count-badge-res');
+            const btnWel = document.getElementById('btn-review-wrong-welcome');
+            const btnRes = document.getElementById('btn-review-wrong-result');
+
+            if (badgeWel) badgeWel.textContent = count;
+            if (badgeRes) badgeRes.textContent = count;
+
+            if (count === 0) {
+                if (btnWel) {
+                    btnWel.disabled = true;
+                    btnWel.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+                if (btnRes) {
+                    btnRes.disabled = true;
+                    btnRes.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            } else {
+                if (btnWel) {
+                    btnWel.disabled = false;
+                    btnWel.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+                if (btnRes) {
+                    btnRes.disabled = false;
+                    btnRes.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            }
+        }
+
+        function saveExamToDeviceHistory(score, correctCount, totalCount, timeStr) {
+            const history = getSavedHistory();
+            const newRecord = {
+                id: Date.now(),
+                date: new Date().toLocaleString('vi-VN'),
+                score: score,
+                correct: correctCount,
+                total: totalCount,
+                time: timeStr
+            };
+            history.unshift(newRecord);
+            if (history.length > 20) history.pop();
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+            } catch (e) {}
+            renderDeviceHistory();
+        }
+
+        function renderDeviceHistory() {
+            const history = getSavedHistory();
+            const listContainer = document.getElementById('device-history-list');
+            const clearBtn = document.getElementById('btn-clear-history');
+            listContainer.innerHTML = '';
+
+            if (history.length === 0) {
+                listContainer.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Chưa có lịch sử làm bài nào được lưu trên thiết bị này.</p>`;
+                clearBtn.classList.add('hidden');
+                return;
+            }
+
+            clearBtn.classList.remove('hidden');
+            history.forEach((record, index) => {
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs hover:bg-slate-100/80 transition-all gap-2";
+                
+                let badgeColor = "bg-emerald-100 text-emerald-800";
+                if (record.score < 5.0) badgeColor = "bg-rose-100 text-rose-800";
+                else if (record.score < 7.0) badgeColor = "bg-amber-100 text-amber-800";
+
+                item.innerHTML = `
+                    <div class="flex items-center space-x-2.5 min-w-0">
+                        <span class="font-bold text-slate-500 flex-shrink-0">#${history.length - index}</span>
+                        <div class="min-w-0">
+                            <span class="font-semibold text-slate-800 block truncate">${record.date}</span>
+                            <span class="text-slate-500 block text-[11px]">Thời gian: ${record.time} • Đúng: ${record.correct}/${record.total} câu</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 flex-shrink-0">
+                        <span class="px-2.5 py-1 rounded-md font-bold ${badgeColor}">${record.score}/10 điểm</span>
+                    </div>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        function clearDeviceHistory() {
+            showModal(
+                "Xóa lịch sử",
+                "Bạn có chắc chắn muốn xóa toàn bộ lịch sử làm bài đã lưu trên thiết bị này không?",
+                () => {
+                    localStorage.removeItem(STORAGE_KEY);
+                    localStorage.removeItem(WRONG_QUESTIONS_KEY);
+                    renderDeviceHistory();
+                    updateWrongQuestionsCountUI();
+                    closeModal();
+                }
+            );
+        }
+
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Bắt đầu thi chính thức (có đếm giờ, tính điểm)
+        function startExam() {
+            currentMode = 'exam';
+            const shuffledPool = shuffleArray(masterQuestionBank);
+            const selectedCount = Math.min(50, shuffledPool.length);
+            setupQuestions(shuffledPool.slice(0, selectedCount));
+        }
+
+        // Bắt đầu chế độ Ôn tập (hiển thị ngay đáp án đúng/sai khi chọn)
+        function startReviewMode() {
+            currentMode = 'review';
+            const shuffledPool = shuffleArray(masterQuestionBank);
+            const selectedCount = Math.min(50, shuffledPool.length);
+            setupQuestions(shuffledPool.slice(0, selectedCount));
+        }
+
+        // Bắt đầu chế độ Ôn tập câu sai (hiển thị ngay đáp án)
+        function startReviewWrongExam() {
+            const wrongList = getWrongQuestions();
+            if (wrongList.length === 0) {
+                alert("Hiện tại không có câu hỏi sai nào được lưu để ôn tập!");
+                return;
+            }
+            currentMode = 'review-wrong';
+            setupQuestions(wrongList);
+        }
+
+        function startReviewWrongExamFromResult() {
+            startReviewWrongExam();
+        }
+
+        function setupQuestions(rawQuestions) {
+            currentQuestions = rawQuestions.map(q => {
+                const originalOptions = q.options.map((opt, idx) => ({ text: opt, isCorrect: idx === q.correct }));
+                const shuffledOpts = shuffleArray(originalOptions);
+                const newCorrectIndex = shuffledOpts.findIndex(opt => opt.isCorrect);
+
+                return {
+                    question: q.q,
+                    options: shuffledOpts.map(opt => opt.text),
+                    correct: newCorrectIndex,
+                    originalRef: q
+                };
+            });
+
+            currentIndex = 0;
+            userAnswers = {};
+            flaggedQuestions.clear();
+            examSubmitted = false;
+            timeLeft = 60 * 60;
+            examStartTime = new Date();
+
+            document.getElementById('screen-welcome').classList.add('hidden');
+            document.getElementById('screen-result').classList.add('hidden');
+            const examScreen = document.getElementById('screen-exam');
+            examScreen.classList.remove('hidden');
+            examScreen.classList.add('flex');
+
+            const timerContainer = document.getElementById('header-timer-container');
+            const submitBtnAction = document.getElementById('btn-submit-action');
+
+            if (currentMode === 'exam') {
+                timerContainer.classList.remove('hidden');
+                timerContainer.classList.add('flex');
+                submitBtnAction.style.display = 'flex';
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(updateTimer, 1000);
+            } else {
+                timerContainer.classList.add('hidden');
+                timerContainer.classList.remove('flex');
+                submitBtnAction.style.display = 'none';
+            }
+
+            renderQuestion();
+            renderPalette();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateTimer() {
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                if (!examSubmitted && currentMode === 'exam') {
+                    autoSubmitExamDueToTimeout();
+                }
+                return;
+            }
+            timeLeft--;
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            document.getElementById('timer-display').textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function autoSubmitExamDueToTimeout() {
+            showModal(
+                "Hết thời gian làm bài",
+                "Thời gian làm bài 60 phút đã kết thúc. Hệ thống sẽ tự động nộp bài của bạn.",
+                () => { executeSubmit(); }
+            );
+            setTimeout(() => { executeSubmit(); }, 3000);
+        }
+
+        function renderQuestion() {
+            const q = currentQuestions[currentIndex];
+            let modeTitle = "";
+            if (currentMode === 'review') modeTitle = "(Chế độ Ôn tập)";
+            else if (currentMode === 'review-wrong') modeTitle = "(Ôn tập câu sai)";
+
+            document.getElementById('current-q-number').textContent = `Câu ${currentIndex + 1} / ${currentQuestions.length} ${modeTitle}`;
+            document.getElementById('question-text').textContent = q.question;
+
+            const isFlagged = flaggedQuestions.has(currentIndex);
+            const flagBadge = document.getElementById('badge-flagged');
+            const flagText = document.getElementById('flag-text');
+            const btnFlag = document.getElementById('btn-flag');
+
+            if (isFlagged) {
+                flagBadge.classList.remove('hidden');
+                flagBadge.classList.add('flex');
+                flagText.textContent = "Bỏ đánh dấu";
+                btnFlag.classList.add('bg-amber-50', 'border-amber-300', 'text-amber-700');
+            } else {
+                flagBadge.classList.add('hidden');
+                flagBadge.classList.remove('flex');
+                flagText.textContent = "Đánh dấu xem lại";
+                btnFlag.classList.remove('bg-amber-50', 'border-amber-300', 'text-amber-700');
+            }
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            const optionLetters = ['A', 'B', 'C', 'D'];
+            const userChoice = userAnswers[currentIndex];
+            const hasAnswered = userChoice !== undefined;
+            const isReviewing = currentMode === 'review' || currentMode === 'review-wrong';
+
+            q.options.forEach((optText, optIdx) => {
+                let optionStyle = 'border-slate-200 hover:border-slate-300 bg-white text-slate-700 hover:bg-slate-50';
+                let indicatorHtml = `<div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex-shrink-0 flex items-center justify-center font-bold text-xs sm:text-sm bg-slate-100 text-slate-600">${optionLetters[optIdx]}</div>`;
+
+                if (isReviewing && hasAnswered) {
+                    if (optIdx === q.correct) {
+                        optionStyle = 'border-emerald-400 bg-emerald-100 text-emerald-950 font-semibold shadow-sm';
+                        indicatorHtml = `<div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex-shrink-0 flex items-center justify-center font-bold text-xs sm:text-sm bg-emerald-600 text-white">${optionLetters[optIdx]}</div>`;
+                    } else if (optIdx === userChoice && userChoice !== q.correct) {
+                        optionStyle = 'border-rose-400 bg-rose-100 text-rose-950 font-semibold shadow-sm';
+                        indicatorHtml = `<div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex-shrink-0 flex items-center justify-center font-bold text-xs sm:text-sm bg-rose-600 text-white">${optionLetters[optIdx]}</div>`;
+                    } else {
+                        optionStyle = 'border-slate-200 bg-slate-50 opacity-60 text-slate-500';
+                    }
+                } else if (!isReviewing && userChoice === optIdx) {
+                    optionStyle = 'border-red-700 bg-red-50 text-red-950 font-medium shadow-sm';
+                    indicatorHtml = `<div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex-shrink-0 flex items-center justify-center font-bold text-xs sm:text-sm bg-red-700 text-white">${optionLetters[optIdx]}</div>`;
+                }
+
+                const optionCard = document.createElement('div');
+                optionCard.className = `p-3 sm:p-4 rounded-xl border-2 transition-all flex items-start justify-between gap-3 ${optionStyle} ${isReviewing && hasAnswered ? 'cursor-default pointer-events-none' : 'cursor-pointer'}`;
+                
+                if (!isReviewing || !hasAnswered) {
+                    optionCard.onclick = () => selectOption(optIdx);
+                }
+
+                let extraIcon = "";
+                if (isReviewing && hasAnswered) {
+                    if (optIdx === q.correct) extraIcon = `<i class="fa-solid fa-circle-check text-emerald-600 ml-2 flex-shrink-0" title="Đáp án đúng"></i>`;
+                    else if (optIdx === userChoice && userChoice !== q.correct) extraIcon = `<i class="fa-solid fa-circle-xmark text-rose-600 ml-2 flex-shrink-0" title="Bạn đã chọn sai"></i>`;
+                }
+
+                optionCard.innerHTML = `
+                    <div class="flex items-start space-x-3 flex-grow min-w-0">
+                        ${indicatorHtml}
+                        <div class="flex-grow pt-0.5 text-xs sm:text-sm md:text-base min-w-0">${optText}</div>
+                    </div>
+                    <div class="flex-shrink-0">${extraIcon}</div>
+                `;
+                optionsContainer.appendChild(optionCard);
+            });
+
+            document.getElementById('btn-prev').disabled = currentIndex === 0;
+            const nextBtn = document.getElementById('btn-next');
+            
+            if (currentIndex === currentQuestions.length - 1) {
+                if (currentMode === 'exam') {
+                    nextBtn.innerHTML = `Hoàn thành <i class="fa-solid fa-check ml-2"></i>`;
+                    nextBtn.onclick = confirmSubmit;
+                    nextBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 sm:px-6 py-2.5 rounded-xl shadow transition-all flex items-center text-xs sm:text-sm";
+                } else {
+                    nextBtn.innerHTML = `Về trang chủ <i class="fa-solid fa-house ml-2"></i>`;
+                    nextBtn.onclick = restartExam;
+                    nextBtn.className = "bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 sm:px-6 py-2.5 rounded-xl shadow transition-all flex items-center text-xs sm:text-sm";
+                }
+            } else {
+                nextBtn.innerHTML = `Câu sau <i class="fa-solid fa-arrow-right ml-2"></i>`;
+                nextBtn.onclick = nextQuestion;
+                nextBtn.className = "bg-red-700 hover:bg-red-800 text-white font-semibold px-5 sm:px-6 py-2.5 rounded-xl shadow transition-all flex items-center text-xs sm:text-sm";
+            }
+
+            renderPalette();
+            updateAnsweredCount();
+        }
+
+        function selectOption(optionIndex) {
+            userAnswers[currentIndex] = optionIndex;
+            renderQuestion();
+        }
+
+        function nextQuestion() {
+            if (currentIndex < currentQuestions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderQuestion();
+            }
+        }
+
+        function jumpToQuestion(index) {
+            currentIndex = index;
+            renderQuestion();
+        }
+
+        function toggleFlagCurrent() {
+            if (flaggedQuestions.has(currentIndex)) {
+                flaggedQuestions.delete(currentIndex);
+            } else {
+                flaggedQuestions.add(currentIndex);
+            }
+            renderQuestion();
+        }
+
+        function renderPalette() {
+            const paletteContainer = document.getElementById('question-palette');
+            paletteContainer.innerHTML = '';
+
+            currentQuestions.forEach((_, idx) => {
+                const isAnswered = userAnswers[idx] !== undefined;
+                const isFlagged = flaggedQuestions.has(idx);
+                const isCurrent = idx === currentIndex;
+
+                const btn = document.createElement('button');
+                btn.textContent = idx + 1;
+                btn.className = `h-8 sm:h-9 rounded-lg font-bold text-xs transition-all relative flex items-center justify-center ${
+                    isCurrent 
+                        ? 'border-2 border-red-700 bg-white text-red-700 shadow-sm' 
+                        : isAnswered 
+                            ? 'bg-red-700 text-white hover:bg-red-800' 
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`;
+
+                if (isFlagged && !isAnswered) {
+                    btn.className += ' bg-amber-100 text-amber-800 border border-amber-400';
+                } else if (isFlagged && isAnswered) {
+                    const dot = document.createElement('span');
+                    dot.className = 'absolute top-1 right-1 w-2 h-2 rounded-full bg-amber-400 border border-white';
+                    btn.appendChild(dot);
+                }
+
+                btn.onclick = () => jumpToQuestion(idx);
+                paletteContainer.appendChild(btn);
+            });
+        }
+
+        function updateAnsweredCount() {
+            const answeredCount = Object.keys(userAnswers).length;
+            document.getElementById('answered-count-badge').textContent = `${answeredCount}/${currentQuestions.length} đã làm`;
+        }
+
+        function confirmSubmit() {
+            const answeredCount = Object.keys(userAnswers).length;
+            const unansweredCount = currentQuestions.length - answeredCount;
+
+            let msg = `Bạn đã hoàn thành ${answeredCount}/${currentQuestions.length} câu hỏi.`;
+            if (unansweredCount > 0) {
+                msg += ` Còn ${unansweredCount} câu chưa trả lời.`;
+            }
+            msg += ` Bạn có chắc chắn muốn nộp bài?`;
+
+            showModal("Xác nhận nộp bài thi", msg, () => {
+                executeSubmit();
+            });
+        }
+
+        function executeSubmit() {
+            if (timerInterval) clearInterval(timerInterval);
+            examSubmitted = true;
+            closeModal();
+
+            let correctCount = 0;
+            let newlyWrongList = [];
+
+            currentQuestions.forEach((q, idx) => {
+                if (userAnswers[idx] === q.correct) {
+                    correctCount++;
+                } else {
+                    newlyWrongList.push({
+                        q: q.question,
+                        options: q.options,
+                        correct: q.correct
+                    });
+                }
+            });
+
+            saveWrongQuestions(newlyWrongList);
+
+            const incorrectCount = currentQuestions.length - correctCount;
+            const score10 = ((correctCount / currentQuestions.length) * 10).toFixed(1);
+            const percent = Math.round((correctCount / currentQuestions.length) * 100);
+
+            const timeElapsedSeconds = (60 * 60) - timeLeft;
+            const timeMin = Math.floor(timeElapsedSeconds / 60);
+            const timeSec = timeElapsedSeconds % 60;
+            const timeStr = `${timeMin.toString().padStart(2, '0')}:${timeSec.toString().padStart(2, '0')}`;
+
+            if (currentMode === 'exam') {
+                saveExamToDeviceHistory(score10, correctCount, currentQuestions.length, timeStr);
+            }
+
+            document.getElementById('result-score').textContent = score10;
+            document.getElementById('stat-correct').textContent = correctCount;
+            document.getElementById('stat-incorrect').textContent = incorrectCount;
+            document.getElementById('stat-time').textContent = timeStr;
+            document.getElementById('stat-percent').textContent = `${percent}%`;
+
+            const gradeBadge = document.getElementById('result-grade-badge');
+            if (score10 >= 8.5) {
+                gradeBadge.textContent = "Xuất sắc";
+                gradeBadge.className = "mt-3 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+            } else if (score10 >= 7.0) {
+                gradeBadge.textContent = "Giỏi";
+                gradeBadge.className = "mt-3 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-500/20 text-blue-400 border border-blue-500/30";
+            } else if (score10 >= 5.0) {
+                gradeBadge.textContent = "Đạt (Qua môn)";
+                gradeBadge.className = "mt-3 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30";
+            } else {
+                gradeBadge.textContent = "Chưa đạt";
+                gradeBadge.className = "mt-3 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-500/20 text-rose-400 border border-rose-500/30";
+            }
+
+            renderReviewHistory();
+
+            document.getElementById('screen-exam').classList.add('hidden');
+            document.getElementById('screen-exam').classList.remove('flex');
+            document.getElementById('header-timer-container').classList.add('hidden');
+            document.getElementById('header-timer-container').classList.remove('flex');
+
+            const resultScreen = document.getElementById('screen-result');
+            resultScreen.classList.remove('hidden');
+            resultScreen.classList.add('flex');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderReviewHistory() {
+            const reviewContainer = document.getElementById('review-container');
+            reviewContainer.innerHTML = '';
+
+            const optionLetters = ['A', 'B', 'C', 'D'];
+
+            currentQuestions.forEach((q, idx) => {
+                const userChoice = userAnswers[idx];
+                const isCorrect = userChoice === q.correct;
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `p-4 sm:p-5 rounded-xl border ${
+                    isCorrect ? 'border-emerald-200 bg-emerald-50/30' : 'border-rose-200 bg-rose-50/30'
+                }`;
+
+                let optionsHtml = '';
+                q.options.forEach((optText, optIdx) => {
+                    let optStyle = "bg-white border-slate-200 text-slate-700";
+                    let iconHtml = "";
+
+                    if (optIdx === q.correct) {
+                        optStyle = "bg-emerald-100 border-emerald-400 text-emerald-950 font-semibold";
+                        iconHtml = `<i class="fa-solid fa-circle-check text-emerald-600 ml-2 flex-shrink-0" title="Đáp án đúng"></i>`;
+                    } else if (optIdx === userChoice && !isCorrect) {
+                        optStyle = "bg-rose-100 border-rose-400 text-rose-950 font-semibold";
+                        iconHtml = `<i class="fa-solid fa-circle-xmark text-rose-600 ml-2 flex-shrink-0" title="Bạn đã chọn sai"></i>`;
+                    }
+
+                    optionsHtml += `
+                        <div class="p-2.5 sm:p-3 rounded-lg border text-xs sm:text-sm flex items-center justify-between gap-2 ${optStyle}">
+                            <div class="flex items-center space-x-2.5 min-w-0">
+                                <span class="w-6 h-6 rounded-md bg-white border border-slate-300 font-bold flex items-center justify-center text-xs text-slate-700 flex-shrink-0">${optionLetters[optIdx]}</span>
+                                <span class="min-w-0">${optText}</span>
+                            </div>
+                            <div class="flex-shrink-0">${iconHtml}</div>
+                        </div>
+                    `;
+                });
+
+                itemDiv.innerHTML = `
+                    <div class="flex items-start justify-between mb-3 gap-2">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="font-bold text-xs sm:text-sm px-2.5 py-1 rounded-md ${isCorrect ? 'bg-emerald-200 text-emerald-800' : 'bg-rose-200 text-rose-800'}">Câu ${idx + 1}</span>
+                            <span class="text-xs font-semibold ${isCorrect ? 'text-emerald-700' : 'text-rose-700'}">
+                                ${isCorrect ? '<i class="fa-solid fa-check mr-1"></i> Đúng' : userChoice === undefined ? '<i class="fa-solid fa-triangle-exclamation mr-1"></i> Chưa trả lời' : '<i class="fa-solid fa-xmark mr-1"></i> Sai'}
+                            </span>
+                        </div>
+                    </div>
+                    <h4 class="font-semibold text-slate-900 mb-3 text-sm sm:text-base">${q.question}</h4>
+                    <div class="space-y-2">
+                        ${optionsHtml}
+                    </div>
+                `;
+
+                reviewContainer.appendChild(itemDiv);
+            });
+        }
+
+        function scrollToReview() {
+            document.getElementById('review-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function restartExam() {
+            if (timerInterval) clearInterval(timerInterval);
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('screen-result').classList.remove('flex');
+            document.getElementById('screen-exam').classList.add('hidden');
+            document.getElementById('screen-exam').classList.remove('flex');
+            document.getElementById('screen-welcome').classList.remove('hidden');
+            renderDeviceHistory();
+            updateWrongQuestionsCountUI();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showModal(title, message, confirmCallback) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            
+            const buttonsContainer = document.getElementById('modal-buttons');
+            buttonsContainer.innerHTML = `
+                <button onclick="closeModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl transition-all text-xs sm:text-sm">Hủy bỏ</button>
+                <button id="modal-confirm-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl transition-all text-xs sm:text-sm">Xác nhận</button>
+            `;
+            document.getElementById('modal-confirm-btn').onclick = confirmCallback;
+            document.getElementById('custom-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
